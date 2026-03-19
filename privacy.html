@@ -1,386 +1,48 @@
-# Star Ring Codex TRPG 仕様書
+# Star Ring Codex TRPG Privacy Policy Stub
 
-## 0. 目的
+これは `Custom GPT + Actions` を将来公開する時のための最小叩き台である。  
+trial 段階ではそのまま公開用には使わず、後で実運用に合わせて具体化する。
 
-`ChatGPT / Custom GPT` を GM・物語生成エンジンとして使い、別のフルスクリーン Web アプリをゲーム UI / HUD / 図鑑 / 相関図 / 装備管理として実装する。
+---
 
-この Web アプリは以下を満たす。
+## 1. 収集する情報
 
-- ゲーム感とビジュアルを最優先する
-- メイン画面は RPG の HUD として振る舞う
-- `MENU` から全画面メニューへ遷移する
-- 相関図と世界図は「見る楽しさ」がある
-- 情報は知識解放制にする
-- ChatGPT とは `Custom GPT + Actions` で連携可能にする
-- ただし `Local Prototype` も持ち、最初は手動コピペでも成立する
+本サービスは、TRPG セッションの進行に必要な最小限の情報を扱います。
 
-## 1. 主人公作成ルール
+- セッション ID
+- sceneState
+- characters / npcs / quests / relations / blessings
+- dice result
+- statePatch
+- logs
 
-このプロジェクトでは、主人公を `自動生成して選ばせる` 方式を既定にしない。
+---
 
-- 既定は `手動キャラクリ`
-- もし候補選択や自動生成を入れる場合も、開始時に
-  - `自分で作る`
-  - `候補から選ぶ`
-  を明示的に選ばせる
-- `何も選べず自動生成された主人公で始まる` フローは採用しない
+## 2. 利用目的
 
-## 2. 実装モード
+これらの情報は以下のために使います。
 
-### Mode A: Local Prototype
+- 現在の物語進行を維持する
+- `Custom GPT + Actions` で scene を進める
+- statePatch を適用してセッション状態を更新する
+- 人物相関図と世界図を表示する
 
-- ChatGPT とは手動コピペ連携
-- フロントエンドだけでも動作
-- 状態保存は IndexedDB / local storage
-- Codex 初期開発はまずこのモードで成立させる
+---
 
-### Mode B: Connected Mode
+## 3. 第三者共有
 
-- `Custom GPT + Actions` から backend API を呼ぶ
-- Web アプリはその backend と同期する
-- ダイス、state patch、クエスト更新、相関図更新を自動反映する
+セッション処理のため、OpenAI の `Custom GPT + Actions` を通じて外部 API に送信される場合があります。  
+それ以外の目的で第三者へ販売・共有することは想定していません。
 
-### 方針
+---
 
-- まず `Local Prototype` を完成させる
-- その後 `Connected Mode` を追加する
-- UI・状態モデルは両モードで共通にする
+## 4. 保存
 
-## 3. 公式仕様を前提にした設計上の制約
+trial / prototype 段階では、主にローカル保存または開発用サーバー上で保持します。  
+本番運用時は保存期間、削除手段、問い合わせ先を別途明記します。
 
-- `Custom GPT` は ChatGPT 内で動く
-- 独自のゲーム UI は自前 Web アプリ側で持つ
-- `Custom Actions` は第三者 API を呼ぶために使う
-- 公開 GPT で外部 API を使う場合、ドメイン確認と `Privacy Policy URL` が必要
-- Actions の 1 回の API 呼び出しは 5 分以内
-- 将来的に Workspace 環境で使う場合、管理者のドメイン許可設定に影響される場合がある
+---
 
-## 4. 推奨技術スタック
+## 5. 問い合わせ
 
-### Frontend
-
-- Vite
-- React
-- TypeScript
-- Tailwind CSS
-- Framer Motion
-- Zustand
-- Dexie.js
-- vis-network
-
-### Backend
-
-- Python 3.12+
-- FastAPI
-- Pydantic
-- SQLAlchemy
-- SQLite（開発）
-- PostgreSQL（将来）
-
-### 補足
-
-- 初期版は Web アプリ
-- 将来、必要なら Tauri ラッパーでデスクトップ化
-- ただし最初から Electron / Tauri にはしない
-
-## 5. UI コンセプト
-
-### デザイン名
-
-`星環コーデックス HUD`
-
-### テーマ
-
-- 群青
-- 蒼銀
-- 古金
-- 星図
-- 月環
-- 水面反射
-- 静謐
-- 神秘
-- RPG 感重視
-
-### 参照イメージ
-
-- エルデンリング系の余白と格調
-- ただし色味はより `星 / 月 / 夜 / 水` 寄り
-- 近未来 SF ではなく神秘的ファンタジー UI
-
-## 6. 画面構成
-
-### 6-1. メイン HUD 画面
-
-#### 目的
-
-- 物語進行
-- 探索
-- 会話
-- イベント進行
-- 最低限の状態確認
-
-#### レイアウト
-
-- 左上: 主人公ステータス
-- 左下: パーティー一覧
-- 右上: クエスト / 時刻 / 天気 / 月相
-- 右中: `MENU` ボタン
-- 下部: 物語ログ / 判定結果 / 状態変化ログ
-- 中央: 背景 / シーン / 対話対象 / 演出
-
-### 6-2. 全画面メニュー
-
-`MENU` から入る。side panel ではなく画面全体を使う。
-
-#### 上部タブ
-
-- 所持品
-- 装備
-- 製作
-- スキル / 魔法
-- 恩寵
-- ステータス
-- 世界図
-- 相関図
-- クエスト
-- ログ
-- 設定
-
-### 6-3. UI の重要原則
-
-- アイコン主体
-- 詳細は右ペインに集約
-- 未知情報は `???` や影で表現
-- 既知情報だけを出す
-- ビジネスダッシュボードではなく、RPG の図鑑 / HUD として見えること
-
-### 6-4. 恩寵画面の追加原則
-
-- 恩寵は `創造神から与えられるチート` として扱う
-- 固定のスキル表ではなく、後から増える `catalog` として扱う
-- ChatGPT / Custom GPT が自由に生成した恩寵も、shared schema に正規化できればそのまま追加できること
-- 詳細カードでは `授かった意味 / 戦闘効果 / 非戦闘効果 / コスト / 制約 / 副作用 / 成長段階 / 隠された真実` を段階解放で見せる
-- UI は `神秘的な加護一覧` と `動的データ管理` を両立する
-
-## 7. 知識解放制
-
-各エンティティと各関係に `visibilityLevel` を持たせる。
-
-- `0`: 未発見
-- `1`: 気配のみ
-- `2`: 基本情報
-- `3`: 深部情報
-
-### 解放条件
-
-- 直接会話
-- 噂
-- 調査
-- 看破系スキル
-- 恩寵
-- 特定イベント
-- 対象との関係深化
-- 特定フラグ成立
-
-## 8. データモデルの主眼
-
-session ルートは最低でも以下を持つ。
-
-- `world`
-- `playerParty`
-- `characters`
-- `npcs`
-- `gods`
-- `nations`
-- `factions`
-- `quests`
-- `items`
-- `equipmentCatalog`
-- `skills`
-- `spells`
-- `blessings`
-- `flags`
-- `relations`
-- `worldRelations`
-- `sceneState`
-- `logs`
-- `diceLogs`
-- `knowledge`
-- `uiState`
-
-### 重要補足
-
-- 主人公は `playerParty` の先頭に置く
-- `playerParty[0]` は手動キャラクリ結果を正本とする
-- 主人公候補の自動生成データは、任意選択モードを作る場合のみ `presets` や `candidateCharacters` のような別管理にする
-
-詳細は [shared_data_model.md](/c:/Users/quiet/Desktop/myproject/isekaiTRPG/Custom%20GPT%20+%20Actions/star-ring-codex-trpg/shared_data_model.md) を正とする。
-
-## 9. 物語生成システムの連携設計
-
-### ChatGPT / Custom GPT 側の役割
-
-- 世界生成
-- NPC 生成
-- 神 / 国家 / 団体生成
-- チート / 魔法 / 技生成
-- 次シーン生成
-- 行動解決
-- `statePatch` 生成
-
-### Web アプリ側の役割
-
-- 状態保持
-- 表示
-- 知識解放管理
-- 相関図 / 世界図描画
-- UI 演出
-- パッチ適用
-- ログ整形
-
-### 連携原則
-
-- ChatGPT は `文章と statePatch を返す`
-- Web アプリは `statePatch` を適用する
-- グラフと HUD は状態から再描画する
-- 創造神由来の恩寵は、`statePatch` と entity 追加を通じて `blessings[]` へ追加し、そのまま `恩寵` 画面へ反映できるようにする
-
-### 中核要件
-
-- NPC は `publicGoal / hiddenNeed / fear / secret / wound / questHooks` を持つ
-- relation は `relationType` だけでなく複数の関係値を持つ
-- quest は人物・勢力・世界圧・rumor から自然に発生する
-- scene は `relation tension` と `quest seed` から立ち上がる
-- 恩寵は `創造神が与えるチート` として自由生成できるが、保存時には `blessing schema` へ正規化する
-
-詳細は [generation_system.md](/c:/Users/quiet/Desktop/myproject/isekaiTRPG/Custom%20GPT%20+%20Actions/star-ring-codex-trpg/generation_system.md) を正とする。
-
-## 10. Connected Mode の API 設計
-
-必須エンドポイント:
-
-1. `GET /api/sessions/{sessionId}/context`
-2. `POST /api/sessions/{sessionId}/patch`
-3. `POST /api/sessions/{sessionId}/roll`
-4. `GET /api/sessions/{sessionId}/entity/{entityId}`
-5. `GET /api/sessions/{sessionId}/graphs/social`
-6. `GET /api/sessions/{sessionId}/graphs/world`
-7. `POST /api/sessions/{sessionId}/unlock`
-
-### API 方針
-
-- `Custom Actions` から呼びやすい少数エンドポイントへ寄せる
-- 1 リクエストは短時間で終わる
-- `statePatch` と shared schema を揃える
-
-## 11. フロントエンド構成
-
-```text
-star-ring-codex/
-├─ apps/
-│  ├─ web/
-│  │  ├─ src/
-│  │  │  ├─ app/
-│  │  │  ├─ pages/
-│  │  │  ├─ components/
-│  │  │  │  ├─ hud/
-│  │  │  │  ├─ menu/
-│  │  │  │  ├─ inventory/
-│  │  │  │  ├─ equipment/
-│  │  │  │  ├─ codex/
-│  │  │  │  ├─ graphs/
-│  │  │  │  ├─ quest/
-│  │  │  │  └─ log/
-│  │  │  ├─ store/
-│  │  │  ├─ domain/
-│  │  │  ├─ services/
-│  │  │  ├─ lib/
-│  │  │  ├─ styles/
-│  │  │  └─ assets/
-│  │  ├─ index.html
-│  │  └─ package.json
-│  └─ api/
-│     ├─ app/
-│     ├─ routers/
-│     ├─ models/
-│     ├─ schemas/
-│     ├─ services/
-│     ├─ db/
-│     └─ main.py
-├─ packages/
-│  ├─ shared-types/
-│  ├─ shared-schema/
-│  └─ shared-utils/
-└─ README.md
-```
-
-## 12. 実装フェーズ
-
-### Phase 1
-
-- Vite + React + TypeScript 初期化
-- HUD 画面
-- `MENU -> 全画面メニュー`
-- テーマトークン
-- ダミーデータで見栄えを出す
-
-### Phase 2
-
-- session store
-- `characters / npcs / items / quests / relations`
-- Dexie 保存
-- import / export
-
-### Phase 3
-
-- vis-network による世界図 / 相関図
-- `visibilityLevel`
-- 詳細ペイン
-
-### Phase 4
-
-- log feed
-- `sceneState`
-- `statePatch` 適用
-- dice log
-- quest update
-
-### Phase 5
-
-- FastAPI
-- `/context`
-- `/patch`
-- `/roll`
-- `/entity`
-- `/graphs/*`
-
-### Phase 6
-
-- animation
-- tooltip
-- icon refinement
-- effect hook
-- PWA
-
-## 13. 受け入れ条件
-
-- HUD が見栄えよく表示される
-- `MENU` から全画面メニューへ遷移できる
-- 所持品 / 装備 / スキル / 恩寵 / 世界図 / 相関図が見られる
-- アイコン hover で説明が出る
-- 相関図で hover / click が効く
-- `visibilityLevel` で未知情報が隠れる
-- ローカル保存ができる
-- `statePatch` の雛形を適用できる
-- 後から FastAPI を足しやすい構成になっている
-
-## 14. 既存方針との整合
-
-この仕様は、既存の `Custom GPT + Actions` 方針を次のように引き継ぐ。
-
-- `Custom GPT + Actions` は引き続き主役
-- `visual-canon/` を人物画像再現の正本として使う
-- `world ripple / chapter cue / visual cue` の payload は将来この Web UI と接続する
-- `trpg-helper-extension/` は試作や fallback 用として残すが、主 UI にはしない
-- 主人公の体験は `自分で作る` ことを最優先する
-
+本番公開時に運営者名、連絡先、削除依頼窓口をここへ追加します。
